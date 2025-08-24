@@ -36,3 +36,6 @@
 
 # Matlab
 *.m~
+
+# vscode
+.vscode/
