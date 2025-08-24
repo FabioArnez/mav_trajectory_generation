@@ -21,6 +21,10 @@
 #ifndef MAV_TRAJECTORY_GENERATION_POLYNOMIAL_OPTIMIZATION_LINEAR_H_
 #define MAV_TRAJECTORY_GENERATION_POLYNOMIAL_OPTIMIZATION_LINEAR_H_
 
+#define GLOG_EXPORT
+#define GLOG_NO_EXPORT
+#define GLOG_DEPRECATED
+
 #include <glog/logging.h>
 #include <Eigen/Sparse>
 #include <tuple>

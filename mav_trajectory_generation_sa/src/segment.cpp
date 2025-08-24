@@ -18,6 +18,10 @@
  * limitations under the License.
  */
 
+#define GLOG_EXPORT
+#define GLOG_NO_EXPORT
+#define GLOG_DEPRECATED
+
 #include "mav_trajectory_generation/segment.h"
 
 #include <cmath>

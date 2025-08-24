@@ -17,6 +17,11 @@
  * implied. See the License for the specific language governing
  * permissions and limitations under the License.
  */
+
+#define GLOG_EXPORT
+#define GLOG_NO_EXPORT
+#define GLOG_DEPRECATED
+
 #include "mav_trajectory_generation/polynomial.h"
 #include "mav_trajectory_generation/rpoly/rpoly_ak1.h"
 
