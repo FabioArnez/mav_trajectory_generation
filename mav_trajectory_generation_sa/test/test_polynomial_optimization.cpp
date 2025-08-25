@@ -866,15 +866,15 @@ OptimizationParams deriv_jerk = {3 /* D */,
                                  1.0 /* v_max */,
                                  2.0 /* a_mav */};
 
-INSTANTIATE_TEST_CASE_P(OneDimension, PolynomialOptimizationTests,
+INSTANTIATE_TEST_SUITE_P(OneDimension, PolynomialOptimizationTests,
                         ::testing::Values(segment_1_dim_1, segment_10_dim_1,
                                           segment_50_dim_1));
 
-INSTANTIATE_TEST_CASE_P(ThreeDimensions, PolynomialOptimizationTests,
+INSTANTIATE_TEST_SUITE_P(ThreeDimensions, PolynomialOptimizationTests,
                         ::testing::Values(segment_1_dim_3, segment_10_dim_3,
                                           segment_50_dim_3));
 
-INSTANTIATE_TEST_CASE_P(Derivatives, PolynomialOptimizationTests,
+INSTANTIATE_TEST_SUITE_P(Derivatives, PolynomialOptimizationTests,
                         ::testing::Values(deriv_accel_1, deriv_accel_3_1,
                                           deriv_accel, deriv_jerk));
 
