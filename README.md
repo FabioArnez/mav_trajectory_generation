@@ -33,6 +33,10 @@ Michael Burri, Helen Oleynikova, Markus Achtelik, and Roland Siegwart, “**Real
   month={Sept}
 }
 ```
+## Standalone Installation Instructions (tested on macOS Sequoia)
+
+For standlone installation (i.e., without ROS dependencies), please check the `mav_trajectory_generation_sa` folder `README.md`.
+
 
 ## Installation Instructions (Ubuntu)
 To install this package with [ROS Indigo](http://wiki.ros.org/indigo/Installation/Ubuntu) or [ROS Kinetic](http://wiki.ros.org/kinetic/Installation/Ubuntu):

@@ -36,3 +36,9 @@
 
 # Matlab
 *.m~
+
+# vscode
+.vscode/
+
+# Build folders
+build/
