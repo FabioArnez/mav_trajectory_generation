@@ -22,9 +22,9 @@
 #include <limits>
 #include <random>
 
-#include <eigen-checks/entrypoint.h>
-#include <eigen-checks/glog.h>
-#include <eigen-checks/gtest.h>
+#include "mav_trajectory_generation/eigen-checks/entrypoint.h"
+#include "mav_trajectory_generation/eigen-checks/glog.h"
+#include "mav_trajectory_generation/eigen-checks/gtest.h"
 
 #include "mav_trajectory_generation/polynomial_optimization_linear.h"
 #include "mav_trajectory_generation/polynomial_optimization_nonlinear.h"
