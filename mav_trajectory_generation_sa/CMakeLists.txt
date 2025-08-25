@@ -1,10 +1,40 @@
 cmake_minimum_required(VERSION 2.8.3...3.5)
 project(mav_trajectory_generation)
 
+# Set the architecture to match your system
+set(CMAKE_OSX_ARCHITECTURES "arm64" CACHE STRING "Build for arm64" FORCE)
+
 include_directories(include)
 
-set(CMAKE_PREFIX_PATH ${CONDA_PREFIX} ${CMAKE_PREFIX_PATH})
+# Find Python - explicitly use the one from Conda environment
+if(NOT Python_EXECUTABLE)
+    set(Python_EXECUTABLE $ENV{CONDA_PREFIX}/bin/python)
+endif()
 
+find_package(Python REQUIRED COMPONENTS Interpreter Development)
+# Add Python include directory
+include_directories(${Python_INCLUDE_DIRS})
+
+# Set the installation prefix to Conda environment
+set(CMAKE_INSTALL_PREFIX $ENV{CONDA_PREFIX})
+
+# Get Python version components
+execute_process(
+  COMMAND ${Python_EXECUTABLE} -c "import sys; print(sys.version_info.major)"
+  OUTPUT_VARIABLE PYTHON_VERSION_MAJOR
+  OUTPUT_STRIP_TRAILING_WHITESPACE
+)
+
+execute_process(
+  COMMAND ${Python_EXECUTABLE} -c "import sys; print(sys.version_info.minor)"
+  OUTPUT_VARIABLE PYTHON_VERSION_MINOR
+  OUTPUT_STRIP_TRAILING_WHITESPACE
+)
+
+message(STATUS "Using Python: ${Python_EXECUTABLE}")
+message(STATUS "Python version: ${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR}")
+
+# Find and include glog library.
 find_library(glog_LIBRARY NAMES glog PATHS ${CONDA_PREFIX}/lib)
 find_path(glog_INCLUDE_DIR NAMES glog/logging.h PATHS ${CONDA_PREFIX}/include)
 
@@ -45,6 +75,13 @@ include_directories(${GTEST_INCLUDE_DIRS})
 find_library(NLopt_LIBRARY NAMES nlopt PATHS ${CONDA_PREFIX}/lib)
 find_path(NLopt_INCLUDE_DIR NAMES nlopt.hpp PATHS ${CONDA_PREFIX}/include)
 
+# Find and include pybind11
+# Option 1: If pybind11 is installed in your Conda environment
+# find_package(pybind11 REQUIRED)
+find_library(pybind11_LIBRARY NAMES pybind11 PATHS ${CONDA_PREFIX}/lib)
+find_path(pybind11_INCLUDE_DIR NAMES pybind11/pybind11.h PATHS ${CONDA_PREFIX}/include)
+# include_directories(${pybind11_INCLUDE_DIRS})
+
 #############
 # LIBRARIES #
 #############
@@ -58,6 +95,7 @@ add_library(${PROJECT_NAME} STATIC
   src/vertex.cpp
   src/io.cpp
   src/rpoly/rpoly_ak1.cpp
+  src/example/example_planner_4dof.cc
 )
 
 # Link against yaml-cpp and glog.
@@ -90,6 +128,33 @@ add_executable(trajectory_generation_4dof_example
 )
 
 target_link_libraries(trajectory_generation_4dof_example ${PROJECT_NAME})
+
+# Add Python bindings executable
+add_library(trajectory_planner MODULE
+  src/example/planner_4dof_pybindings.cc
+)
+target_link_libraries(trajectory_planner
+  ${PROJECT_NAME}
+  ${pybind11_LIBRARIES}
+  ${YamlCpp_LIBRARY}
+  ${glog_LIBRARIES}
+  Eigen3::Eigen
+  Boost::system
+  ${NLopt_LIBRARY}
+  ${Python_LIBRARIES}  # Add this line to link against Python libraries
+)
+
+# Set the output name and install directory
+set_target_properties(trajectory_planner PROPERTIES
+  PREFIX ""
+  SUFFIX ".so"
+  OUTPUT_NAME "trajectory_planner"
+)
+
+# Install the Python module
+install(TARGETS trajectory_planner
+  LIBRARY DESTINATION lib/python${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR}/site-packages
+)
 
 #########
 # TESTS #
