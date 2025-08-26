@@ -12,6 +12,8 @@ if(NOT Python_EXECUTABLE)
 endif()
 
 find_package(Python REQUIRED COMPONENTS Interpreter Development)
+message(STATUS "Using Python Libraries: ${Python_LIBRARIES}")
+
 # Add Python include directory
 include_directories(${Python_INCLUDE_DIRS})
 
@@ -76,11 +78,9 @@ find_library(NLopt_LIBRARY NAMES nlopt PATHS ${CONDA_PREFIX}/lib)
 find_path(NLopt_INCLUDE_DIR NAMES nlopt.hpp PATHS ${CONDA_PREFIX}/include)
 
 # Find and include pybind11
-# Option 1: If pybind11 is installed in your Conda environment
-# find_package(pybind11 REQUIRED)
-find_library(pybind11_LIBRARY NAMES pybind11 PATHS ${CONDA_PREFIX}/lib)
-find_path(pybind11_INCLUDE_DIR NAMES pybind11/pybind11.h PATHS ${CONDA_PREFIX}/include)
-# include_directories(${pybind11_INCLUDE_DIRS})
+find_package(pybind11 REQUIRED)
+# find_library(pybind11_LIBRARY NAMES pybind11 PATHS ${CONDA_PREFIX}/lib)
+# find_path(pybind11_INCLUDE_DIR NAMES pybind11/pybind11.h PATHS ${CONDA_PREFIX}/include)
 
 #############
 # LIBRARIES #
@@ -130,18 +130,8 @@ add_executable(trajectory_generation_4dof_example
 target_link_libraries(trajectory_generation_4dof_example ${PROJECT_NAME})
 
 # Add Python bindings executable
-add_library(trajectory_planner MODULE
+pybind11_add_module(trajectory_planner
   src/example/planner_4dof_pybindings.cc
-)
-target_link_libraries(trajectory_planner
-  ${PROJECT_NAME}
-  ${pybind11_LIBRARIES}
-  ${YamlCpp_LIBRARY}
-  ${glog_LIBRARIES}
-  Eigen3::Eigen
-  Boost::system
-  ${NLopt_LIBRARY}
-  ${Python_LIBRARIES}  # Add this line to link against Python libraries
 )
 
 # Set the output name and install directory
@@ -149,6 +139,7 @@ set_target_properties(trajectory_planner PROPERTIES
   PREFIX ""
   SUFFIX ".so"
   OUTPUT_NAME "trajectory_planner"
+  LINK_FLAGS "-undefined dynamic_lookup"
 )
 
 # Install the Python module
@@ -176,8 +167,8 @@ target_link_libraries(test_polynomial_optimization ${PROJECT_NAME} ${GTEST_LIBRA
 ##########
 # INSTALL #
 ##########
-install(TARGETS ${PROJECT_NAME} polynomial_timing_evaluation
-  ARCHIVE DESTINATION lib
-  LIBRARY DESTINATION lib
-  RUNTIME DESTINATION bin
-)
+# install(TARGETS ${PROJECT_NAME} polynomial_timing_evaluation
+#   ARCHIVE DESTINATION lib
+#   LIBRARY DESTINATION lib
+#   RUNTIME DESTINATION bin
+# )
