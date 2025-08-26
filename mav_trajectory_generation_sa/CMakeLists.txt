@@ -132,6 +132,18 @@ target_link_libraries(trajectory_generation_4dof_example ${PROJECT_NAME})
 # Add Python bindings executable
 pybind11_add_module(trajectory_planner
   src/example/planner_4dof_pybindings.cc
+  src/example/example_planner_4dof.cc
+  src/motion_defines.cpp
+  src/polynomial.cpp
+  src/polynomial_timing_evaluation.cpp
+  src/motion_defines.cpp
+  src/trajectory.cpp
+  src/trajectory_sampling.cpp
+  src/vertex.cpp
+  src/timing.cpp
+  src/segment.cpp
+  src/io.cpp
+  src/rpoly/rpoly_ak1.cpp
 )
 
 # Set the output name and install directory
