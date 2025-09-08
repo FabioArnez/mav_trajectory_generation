@@ -146,6 +146,9 @@ pybind11_add_module(trajectory_planner
   src/rpoly/rpoly_ak1.cpp
 )
 
+# Add this line to link the Python module to its required libraries
+target_link_libraries(trajectory_planner PRIVATE ${PROJECT_NAME} ${glog_LIBRARIES} ${NLopt_LIBRARY} ${YamlCpp_LIBRARY} Eigen3::Eigen Boost::system)
+
 # Set the output name and install directory
 set_target_properties(trajectory_planner PROPERTIES
   PREFIX ""

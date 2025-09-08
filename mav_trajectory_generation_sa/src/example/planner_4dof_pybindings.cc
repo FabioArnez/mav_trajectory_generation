@@ -19,8 +19,14 @@ PYBIND11_MODULE(trajectory_planner, m) {
         .def("getMaxSpeed", &ExamplePlanner4D::getMaxSpeed)
         .def("setMaxAcceleration", &ExamplePlanner4D::setMaxAcceleration)
         .def("getMaxAcceleration", &ExamplePlanner4D::getMaxAcceleration)
-        .def("setCurrentPose", &ExamplePlanner4D::setCurrentPose)
-        .def("setCurrentVelocity", &ExamplePlanner4D::setCurrentVelocity)
+        .def("setCurrentPose", [](ExamplePlanner4D &self, const Eigen::Matrix4d &pose) {
+            Eigen::Affine3d affine_pose;
+            affine_pose.matrix() = pose;
+            self.setCurrentPose(affine_pose);
+        })
+        .def("setCurrentVelocity", [](ExamplePlanner4D &self, const Eigen::Vector3d &velocity) {
+            self.setCurrentVelocity(velocity);
+        })
         .def("planTrajectory", py::overload_cast<const Eigen::VectorXd&, const Eigen::VectorXd&, Trajectory*>(&ExamplePlanner4D::planTrajectory))
         .def("planTrajectory", py::overload_cast<const Eigen::VectorXd&, const Eigen::VectorXd&, const Eigen::VectorXd&, const Eigen::VectorXd&, double, double, Trajectory*>(&ExamplePlanner4D::planTrajectory))
         .def("saveTrajectoryToCSV", &ExamplePlanner4D::saveTrajectoryToCSV);
