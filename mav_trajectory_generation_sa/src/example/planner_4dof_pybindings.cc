@@ -24,7 +24,7 @@ PYBIND11_MODULE(trajectory_planner, m) {
             affine_pose.matrix() = pose;
             self.setCurrentPose(affine_pose);
         })
-        .def("setCurrentVelocity", [](ExamplePlanner4D &self, const Eigen::Vector3d &velocity) {
+        .def("setCurrentVelocity", [](ExamplePlanner4D &self, const Eigen::Vector4d &velocity) {
             self.setCurrentVelocity(velocity);
         })
         .def("planTrajectory", py::overload_cast<const Eigen::VectorXd&, const Eigen::VectorXd&, Trajectory*>(&ExamplePlanner4D::planTrajectory))

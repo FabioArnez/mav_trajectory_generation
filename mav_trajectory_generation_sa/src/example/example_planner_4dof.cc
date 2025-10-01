@@ -6,7 +6,7 @@
 ExamplePlanner4D::ExamplePlanner4D()
     : max_v_(2.0),
       max_a_(2.0),
-      current_velocity_(Eigen::Vector3d::Zero()),
+      current_velocity_(Eigen::Vector4d::Zero()),
       current_pose_(Eigen::Affine3d::Identity()) {
 }
 
@@ -36,7 +36,7 @@ void ExamplePlanner4D::setCurrentPose(const Eigen::Affine3d& pose) {
 }
 
 // Method to set current velocity.
-void ExamplePlanner4D::setCurrentVelocity(const Eigen::Vector3d& velocity) {
+void ExamplePlanner4D::setCurrentVelocity(const Eigen::Vector4d& velocity) {
   current_velocity_ = velocity;
 }
 
@@ -54,7 +54,7 @@ bool ExamplePlanner4D::planTrajectory(const Eigen::VectorXd& goal_pos,
   Eigen::Vector4d start_pos_4d, start_vel_4d;
   start_pos_4d << current_pose_.translation(),
       Eigen::Quaterniond(current_pose_.rotation()).toRotationMatrix().eulerAngles(2, 1, 0)[0];
-  start_vel_4d << current_velocity_, 0.0;
+  start_vel_4d << current_velocity_;
 
   success = planTrajectory(
       goal_pos, goal_vel, start_pos_4d, start_vel_4d, max_v_, max_a_,

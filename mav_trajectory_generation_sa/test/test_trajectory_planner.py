@@ -273,8 +273,7 @@ def test_planner():
     planner.setCurrentPose(current_pose)
 
     # Set current velocity
-    current_velocity = np.array([1.0, 0.0, 0.0])
-    # current_velocity = np.array([1.0, 0.0, 0.0, 0.0])
+    current_velocity = np.array([1.0, 0.0, 0.0, 0.0])  # use 4D vector [vx, vy, vz, yaw_vel]
     planner.setCurrentVelocity(current_velocity)
 
     # Define goal position and velocity

@@ -16,7 +16,7 @@ class ExamplePlanner4D {
         double getMaxAcceleration() const;
 
         void setCurrentPose(const Eigen::Affine3d& pose);
-        void setCurrentVelocity(const Eigen::Vector3d& velocity);
+        void setCurrentVelocity(const Eigen::Vector4d& velocity);
 
         bool planTrajectory(const Eigen::VectorXd& goal_pos,
                             const Eigen::VectorXd& goal_vel,
@@ -34,7 +34,7 @@ class ExamplePlanner4D {
 
     private:
         Eigen::Affine3d current_pose_;
-        Eigen::Vector3d current_velocity_;
+        Eigen::Vector4d current_velocity_;
         double max_v_; // m/s
         double max_a_; // m/s^2
 };
