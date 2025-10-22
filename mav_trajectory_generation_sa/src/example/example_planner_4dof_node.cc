@@ -41,7 +41,7 @@ int main(int argc, char** argv) {
 
   // Set start position, yaw, velocity, and yaw velocity
   Eigen::Vector3d start_position(start_pos[0], start_pos[1], start_pos[2]);
-  Eigen::Vector3d start_velocity(start_vel[0], start_vel[1], start_vel[2]);
+  Eigen::Vector4d start_velocity(start_vel[0], start_vel[1], start_vel[2], start_yaw_vel);
 
   // Convert yaw to rotation matrix
   Eigen::Matrix3d rotation_mat;
