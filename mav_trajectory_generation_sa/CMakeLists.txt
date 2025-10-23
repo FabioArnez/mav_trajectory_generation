@@ -129,10 +129,14 @@ add_executable(trajectory_generation_4dof_example
 
 target_link_libraries(trajectory_generation_4dof_example ${PROJECT_NAME})
 
+###################
+# PYTHON BINDINGS #
+###################
+
 # Add Python bindings executable
 pybind11_add_module(trajectory_planner
-  src/example/planner_4dof_pybindings.cc
-  src/example/example_planner_4dof.cc
+  src/pybindings/trajectory_planner_4dof_pybindings.cc
+  src/pybindings/trajectory_planner_4dof.cc
   src/motion_defines.cpp
   src/polynomial.cpp
   src/polynomial_timing_evaluation.cpp

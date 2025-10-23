@@ -14,6 +14,7 @@ Install the following dependencies in the conda environment, for succesful C++ c
 
 ```bash
 conda install conda-forge::cmake
+conda install conda-forge::pkgconfig
 conda install conda-forge::glog
 conda install anaconda::gflags
 conda install conda-forge::eigen
@@ -23,7 +24,14 @@ conda install -c conda-forge gtest==1.16.0
 conda install -c conda-forge nlopt==2.8.0
 ```
 
-## Build Trajectory Planner Code
+For Python bindings support use:
+```bash
+conda install -c conda-forge pybind11
+```
+
+## Build Trajectory Planner Code from Scratch
+
+To compile the trajectory planner code from scratch (without ROS dependencies), follow the steps below:
 
 1. Download the repository code:
     ```bash
@@ -72,7 +80,15 @@ conda install -c conda-forge nlopt==2.8.0
         ```bash
         cmake -DCONDA_PREFIX=$CONDA_PREFIX .. 
         ```
-    - Once this is done, finally run:
+
+        For Python bindings, use the following command:
+
+        ```bash
+        cmake -DCONDA_PREFIX=$CONDA_PREFIX -DCMAKE_INSTALL_PREFIX=$CONDA_PREFIX ..   
+        ```
+
+    - Once this is done, finally run the following command:
+    
         ```bash
         make
         ```
