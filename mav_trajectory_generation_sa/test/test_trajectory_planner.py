@@ -2,7 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from math import pi
 from mpl_toolkits.mplot3d import Axes3D
-from trajectory_planner import ExamplePlanner4D, Trajectory, derivative_order
+from trajectory_planner import TrajectoryPlanner4DOF, Trajectory, derivative_order
 
 
 def plot_trajectory(trajectory):
@@ -40,7 +40,7 @@ def plot_trajectory(trajectory):
                color='red', s=100, label='End')
 
     # Add orientation arrows
-    arrow_length = 0.2  # Length of the orientation arrows
+    arrow_length = 0.4  # Length of the orientation arrows
     for i, (pos, yaw) in enumerate(zip(positions, orientations)):
         # Calculate arrow direction in 3D space
         # Assuming yaw is rotation around Z-axis
@@ -262,7 +262,7 @@ def plot_trajectory_quadrotor(trajectory):
 
 def test_planner():
     # Create planner instance
-    planner = ExamplePlanner4D()
+    planner = TrajectoryPlanner4DOF()
 
     # Set parameters
     planner.setMaxSpeed(2.0)
@@ -277,8 +277,8 @@ def test_planner():
     planner.setCurrentVelocity(current_velocity)
 
     # Define goal position and velocity
-    goal_pos = np.array([3.0, 1.0, 0.0, pi/4])  # x, y, z, yaw
-    goal_vel = np.array([0.0, 0.0, 0.0, 0])  # vx, vy, vz, yaw_vel
+    goal_pos = np.array([3.0, 1.0, 1.0, pi/4])  # x, y, z, yaw
+    goal_vel = np.array([0.7071, 0.7071, 0.0, 0])  # vx, vy, vz, yaw_vel
 
     # Plan trajectory
     trajectory = Trajectory()

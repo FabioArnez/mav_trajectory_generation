@@ -1,7 +1,7 @@
 #include <pybind11/pybind11.h>
 #include <pybind11/eigen.h>
 #include <pybind11/stl.h>
-#include "mav_trajectory_generation/example/example_planner_4dof.h"
+#include "mav_trajectory_generation/pybindings/trajectory_planner_4dof.h"
 #include "mav_trajectory_generation/polynomial_optimization_nonlinear.h"
 #include "mav_trajectory_generation/motion_defines.h"
 
@@ -10,26 +10,26 @@ using namespace py::literals;
 using namespace mav_trajectory_generation;
 
 PYBIND11_MODULE(trajectory_planner, m) {
-    m.doc() = "Python bindings for the 4D trajectory planner";
+    m.doc() = "Python bindings for the 4DOF trajectory planner";
 
-    // Bind ExamplePlanner4D class
-    py::class_<ExamplePlanner4D>(m, "ExamplePlanner4D")
+    // Bind TrajectoryPlanner4DOF class
+    py::class_<TrajectoryPlanner4DOF>(m, "TrajectoryPlanner4DOF")
         .def(py::init<>())
-        .def("setMaxSpeed", &ExamplePlanner4D::setMaxSpeed)
-        .def("getMaxSpeed", &ExamplePlanner4D::getMaxSpeed)
-        .def("setMaxAcceleration", &ExamplePlanner4D::setMaxAcceleration)
-        .def("getMaxAcceleration", &ExamplePlanner4D::getMaxAcceleration)
-        .def("setCurrentPose", [](ExamplePlanner4D &self, const Eigen::Matrix4d &pose) {
+        .def("setMaxSpeed", &TrajectoryPlanner4DOF::setMaxSpeed)
+        .def("getMaxSpeed", &TrajectoryPlanner4DOF::getMaxSpeed)
+        .def("setMaxAcceleration", &TrajectoryPlanner4DOF::setMaxAcceleration)
+        .def("getMaxAcceleration", &TrajectoryPlanner4DOF::getMaxAcceleration)
+        .def("setCurrentPose", [](TrajectoryPlanner4DOF &self, const Eigen::Matrix4d &pose) {
             Eigen::Affine3d affine_pose;
             affine_pose.matrix() = pose;
             self.setCurrentPose(affine_pose);
         })
-        .def("setCurrentVelocity", [](ExamplePlanner4D &self, const Eigen::Vector4d &velocity) {
+        .def("setCurrentVelocity", [](TrajectoryPlanner4DOF &self, const Eigen::Vector4d &velocity) {
             self.setCurrentVelocity(velocity);
         })
-        .def("planTrajectory", py::overload_cast<const Eigen::VectorXd&, const Eigen::VectorXd&, Trajectory*>(&ExamplePlanner4D::planTrajectory))
-        .def("planTrajectory", py::overload_cast<const Eigen::VectorXd&, const Eigen::VectorXd&, const Eigen::VectorXd&, const Eigen::VectorXd&, double, double, Trajectory*>(&ExamplePlanner4D::planTrajectory))
-        .def("saveTrajectoryToCSV", &ExamplePlanner4D::saveTrajectoryToCSV);
+        .def("planTrajectory", py::overload_cast<const Eigen::VectorXd&, const Eigen::VectorXd&, Trajectory*>(&TrajectoryPlanner4DOF::planTrajectory))
+        .def("planTrajectory", py::overload_cast<const Eigen::VectorXd&, const Eigen::VectorXd&, const Eigen::VectorXd&, const Eigen::VectorXd&, double, double, Trajectory*>(&TrajectoryPlanner4DOF::planTrajectory))
+        .def("saveTrajectoryToCSV", &TrajectoryPlanner4DOF::saveTrajectoryToCSV);
 
     // Bind Trajectory class
     py::class_<Trajectory>(m, "Trajectory")
