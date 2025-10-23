@@ -29,7 +29,9 @@ For Python bindings support use:
 conda install -c conda-forge pybind11
 ```
 
-## Build Trajectory Planner Code
+## Build Trajectory Planner Code from Scratch
+
+To compile the trajectory planner code from scratch (without ROS dependencies), follow the steps below:
 
 1. Download the repository code:
     ```bash
