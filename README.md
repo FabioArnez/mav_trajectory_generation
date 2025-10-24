@@ -10,13 +10,13 @@ This repository contains the Python bindings for the standalone [`mav_trajectory
 
 Follow the steps below to install the Python bindings for the `mav_trajectory_generation` repository:
 
-1. **Clone this Repository**
+1. **Clone this Repository**:
   
     ```bash
     git clone git@github.com:FabioArnez/mav_trajectory_generation.git
     ```
 
-2. **Move inside the ``mav_trajectory_generation_sa`` folder**
+2. **Move inside the ``mav_trajectory_generation_sa`` (standalone compilation) folder**:
 
     ```bash
     cd mav_trajectory_generation_sa
@@ -93,7 +93,6 @@ from trajectory_planner import derivative_order
 
 The [`mav_trajectory_generation`](https://github.com/ethz-asl/mav_trajectory_generation) repository contains tools for polynomial trajectory generation and optimization based on methods described in [1].
 These techniques are especially suitable for rotary-wing micro aerial vehicles (MAVs).
-This README provides a brief overview of our trajectory generation utilities with some examples.
 
 **Authors**: Markus Achtelik, Michael Burri, Helen Oleynikova, Rik Bähnemann, Marija Popović  
 **Maintainer**: Rik Bähnemann, brik@ethz.ch  
