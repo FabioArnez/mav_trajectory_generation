@@ -1,24 +1,54 @@
-cmake_minimum_required(VERSION 2.8.3...3.5)
+cmake_minimum_required(VERSION 3.10...3.28)
 project(mav_trajectory_generation)
 
-# Set the architecture to match your system
-set(CMAKE_OSX_ARCHITECTURES "arm64" CACHE STRING "Build for arm64" FORCE)
+# macOS: only force arm64 when actually running on Apple Silicon
+if(APPLE)
+  execute_process(COMMAND uname -m OUTPUT_VARIABLE HOST_ARCH OUTPUT_STRIP_TRAILING_WHITESPACE)
+  if(HOST_ARCH STREQUAL "arm64")
+    set(CMAKE_OSX_ARCHITECTURES "arm64" CACHE STRING "Build for arm64" FORCE)
+  endif()
+endif()
 
 include_directories(include)
 
-# Find Python - explicitly use the one from Conda environment
-if(NOT Python_EXECUTABLE)
-    set(Python_EXECUTABLE $ENV{CONDA_PREFIX}/bin/python)
+# Auto-detect active Python environment: Conda > UV/venv > system
+# Override with: cmake -DENV_PREFIX=/path/to/env ..
+if(NOT DEFINED ENV_PREFIX OR ENV_PREFIX STREQUAL "")
+  if(DEFINED ENV{CONDA_PREFIX} AND NOT "$ENV{CONDA_PREFIX}" STREQUAL "")
+    set(ENV_PREFIX $ENV{CONDA_PREFIX})
+    message(STATUS "Detected Conda environment: ${ENV_PREFIX}")
+  elseif(DEFINED ENV{VIRTUAL_ENV} AND NOT "$ENV{VIRTUAL_ENV}" STREQUAL "")
+    set(ENV_PREFIX $ENV{VIRTUAL_ENV})
+    message(STATUS "Detected UV/venv environment: ${ENV_PREFIX}")
+  else()
+    set(ENV_PREFIX "")
+    message(STATUS "No Python environment detected, using system paths")
+  endif()
+endif()
+
+# Library search hints: env prefix first, system paths as fallback
+set(ENV_LIB_HINT "")
+set(ENV_INC_HINT "")
+if(NOT ENV_PREFIX STREQUAL "")
+  set(ENV_LIB_HINT ${ENV_PREFIX}/lib)
+  set(ENV_INC_HINT ${ENV_PREFIX}/include)
+endif()
+
+if(NOT Python_EXECUTABLE AND NOT ENV_PREFIX STREQUAL "")
+  set(Python_EXECUTABLE ${ENV_PREFIX}/bin/python)
 endif()
 
 find_package(Python REQUIRED COMPONENTS Interpreter Development)
+message(STATUS "Using Python: ${Python_EXECUTABLE}")
 message(STATUS "Using Python Libraries: ${Python_LIBRARIES}")
 
 # Add Python include directory
 include_directories(${Python_INCLUDE_DIRS})
 
-# Set the installation prefix to Conda environment
-set(CMAKE_INSTALL_PREFIX $ENV{CONDA_PREFIX})
+# Install into the active environment root by default
+if(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT AND NOT ENV_PREFIX STREQUAL "")
+  set(CMAKE_INSTALL_PREFIX "${ENV_PREFIX}" CACHE PATH "Install prefix" FORCE)
+endif()
 
 # Get Python version components
 execute_process(
@@ -37,8 +67,8 @@ message(STATUS "Using Python: ${Python_EXECUTABLE}")
 message(STATUS "Python version: ${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR}")
 
 # Find and include glog library.
-find_library(glog_LIBRARY NAMES glog PATHS ${CONDA_PREFIX}/lib)
-find_path(glog_INCLUDE_DIR NAMES glog/logging.h PATHS ${CONDA_PREFIX}/include)
+find_library(glog_LIBRARY NAMES glog HINTS ${ENV_LIB_HINT})
+find_path(glog_INCLUDE_DIR NAMES glog/logging.h HINTS ${ENV_INC_HINT})
 
 set(glog_INCLUDE_DIRS ${glog_INCLUDE_DIR})
 set(glog_LIBRARIES ${glog_LIBRARY})
@@ -49,16 +79,18 @@ message(STATUS "glog_INCLUDE_DIRS: ${glog_INCLUDE_DIRS}")
 message(STATUS "glog_LIBRARIES: ${glog_LIBRARIES}")
 
 # Find and include Boost library.
-find_package(Boost REQUIRED COMPONENTS system)
+# boost::system is header-only since Boost 1.71, so no component needed.
+find_package(Boost REQUIRED)
 include_directories(${Boost_INCLUDE_DIRS})
 
 set(CMAKE_MACOSX_RPATH 0)
-add_definitions(-std=c++14)
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # Link against system yaml-cpp if installed.
 find_package(PkgConfig)
 
-find_library(YamlCpp_LIBRARY NAMES yaml-cpp PATHS ${CONDA_PREFIX}/lib)
+find_library(YamlCpp_LIBRARY NAMES yaml-cpp HINTS ${ENV_LIB_HINT})
 # find_package(yaml-cpp REQUIRED)
 # pkg_check_modules(YamlCpp REQUIRED yaml-cpp>=0.5)
 
@@ -74,8 +106,8 @@ include_directories(${GTEST_INCLUDE_DIRS})
 # find_package(NLopt REQUIRED)
 # include_directories(${NLopt_INCLUDE_DIRS})
 # Manually specify NLopt library path
-find_library(NLopt_LIBRARY NAMES nlopt PATHS ${CONDA_PREFIX}/lib)
-find_path(NLopt_INCLUDE_DIR NAMES nlopt.hpp PATHS ${CONDA_PREFIX}/include)
+find_library(NLopt_LIBRARY NAMES nlopt HINTS ${ENV_LIB_HINT})
+find_path(NLopt_INCLUDE_DIR NAMES nlopt.hpp HINTS ${ENV_INC_HINT})
 
 # Find and include pybind11
 find_package(pybind11 REQUIRED)
@@ -99,7 +131,7 @@ add_library(${PROJECT_NAME} STATIC
 )
 
 # Link against yaml-cpp and glog.
-target_link_libraries(${PROJECT_NAME} ${YamlCpp_LIBRARY} ${glog_LIBRARIES} Eigen3::Eigen Boost::system ${NLopt_LIBRARY})
+target_link_libraries(${PROJECT_NAME} ${YamlCpp_LIBRARY} ${glog_LIBRARIES} Eigen3::Eigen ${NLopt_LIBRARY})
 
 ############
 # BINARIES #
@@ -151,15 +183,21 @@ pybind11_add_module(trajectory_planner
 )
 
 # Add this line to link the Python module to its required libraries
-target_link_libraries(trajectory_planner PRIVATE ${PROJECT_NAME} ${glog_LIBRARIES} ${NLopt_LIBRARY} ${YamlCpp_LIBRARY} Eigen3::Eigen Boost::system)
+target_link_libraries(trajectory_planner PRIVATE ${PROJECT_NAME} ${glog_LIBRARIES} ${NLopt_LIBRARY} ${YamlCpp_LIBRARY} Eigen3::Eigen)
 
 # Set the output name and install directory
 set_target_properties(trajectory_planner PROPERTIES
   PREFIX ""
   SUFFIX ".so"
   OUTPUT_NAME "trajectory_planner"
-  LINK_FLAGS "-undefined dynamic_lookup"
 )
+
+# -undefined dynamic_lookup is a macOS-only linker flag
+if(APPLE)
+  set_target_properties(trajectory_planner PROPERTIES
+    LINK_FLAGS "-undefined dynamic_lookup"
+  )
+endif()
 
 # Install the Python module
 install(TARGETS trajectory_planner
